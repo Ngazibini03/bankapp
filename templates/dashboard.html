@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f4f8fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Background */
+        .hero-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, royalblue, white);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        /* Page Container */
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: #007BFF;
+            margin-bottom: 10px;
+        }
+
+        header p.slogan {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        /* User Info */
+        .user-info {
+            background-color: #f9fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .user-info p {
+            font-size: 1rem;
+            margin: 10px 0;
+        }
+
+        .user-info strong {
+            font-size: 1.2rem;
+            color: #007BFF;
+        }
+
+        /* Form Styling */
+        form {
+            margin-bottom: 25px;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+        }
+
+        /* Alert Box */
+        .alert-warning {
+            background-color: #3ef800;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .alert-warning ul {
+            list-style: none;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #ff0000;
+            color: white;
+            border-radius: 6px;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background-color: #8d0101;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background -->
+    <div class="hero-bg"></div>
+
+    <!-- Dashboard Container -->
+    <div class="container">
+        
+        <!-- Header -->
+        <header>
+            <h1>Aspen Trust</h1>
+            <p class="slogan">Take Charge of Your Money Like Never Before</p>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-warning">
+                    <ul>
+                        {% for category, message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- User Info Section -->
+        <div class="user-info">
+            <p><strong>Welcome, {{ user['name'] }} {{ user['surname'] }}!</strong></p>
+            <p><strong>Account Number:</strong> {{ user['account_number'] }}</p>
+            <p><strong>Balance:</strong> R{{ user['balance'] }}</p>
+        </div>
+
+        <h4>Transact</h4>
+<div class="dropdown">
+    <button class="btn-primary transact-btn" onclick="toggleDropdown()">Transact</button>
+    <div id="dropdown-menu" class="dropdown-menu">
+        <a href="#" onclick="showForm('deposit-form')">Deposit</a>
+        <a href="#" onclick="showForm('withdraw-form')">Withdraw</a>
+        <a href="#" onclick="showForm('transfer-form')">Transfer</a>
+    </div>
+</div>
+
+<!-- Forms -->
+<div id="deposit-form" class="form-container hidden">
+    <h4>Deposit</h4>
+    <form action="{{ url_for('deposit') }}" method="POST">
+        <input type="number" name="amount" required placeholder="Amount to deposit">
+        <button class="btn-success" type="submit">Deposit</button>
+    </form>
+</div>
+
+<div id="withdraw-form" class="form-container hidden">
+    <h4>Withdraw</h4>
+    <form action="{{ url_for('withdraw') }}" method="POST">
+        <input type="number" name="amount" required placeholder="Amount to withdraw">
+        <button class="btn-danger" type="submit">Withdraw</button>
+    </form>
+</div>
+
+<div id="transfer-form" class="form-container hidden">
+    <h4>Transfer</h4>
+    <form action="{{ url_for('transfer') }}" method="POST">
+        <input type="text" name="recipient_username" required placeholder="Recipient Username">
+        <input type="number" name="amount" step="0.01" required placeholder="Amount to transfer (ZAR)">
+        <button class="btn-primary" type="submit">Transfer</button>
+    </form>
+</div>
+
+<style>
+    /* Dropdown Styles */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .transact-btn {
+        padding: 12px;
+        font-size: 1rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        z-index: 100;
+        margin-top: 5px;
+    }
+
+    .dropdown-menu a {
+        display: block;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: #007bff;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+    }
+
+    .dropdown-menu a:hover {
+        background-color: #f0f4f8;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .form-container {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: #f9fafc;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<script>
+    function toggleDropdown() {
+        const menu = document.getElementById('dropdown-menu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function showForm(formId) {
+        // Hide all forms
+        const forms = document.querySelectorAll('.form-container');
+        forms.forEach(form => form.classList.add('hidden'));
+
+        // Show the selected form
+        const selectedForm = document.getElementById(formId);
+        selectedForm.classList.remove('hidden');
+
+        // Close the dropdown menu
+        document.getElementById('dropdown-menu').style.display = 'none';
+    }
+
+    // Close dropdown if clicked outside
+    window.onclick = function(event) {
+        const dropdown = document.querySelector('.dropdown');
+        if (!dropdown.contains(event.target)) {
+            document.getElementById('dropdown-menu').style.display = 'none';
+        }
+    };
+</script>
+
+
+        <!-- Transaction History -->
+        <h4>Transaction History</h4>
+        <a class="btn-info" href="{{ url_for('view_history') }}">View History</a>
+
+        <!-- Logout -->
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+
+</body>
+
+<footer>
+    <p>&copy; 2024 Lindokuhle Ngazibini Nongwe. All rights reserved.</p>
+</footer>
+</html>
